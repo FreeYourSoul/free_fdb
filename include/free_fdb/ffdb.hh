@@ -29,15 +29,17 @@
 #include <exception>
 #include <memory>
 
+#define FDB_API_VERSION 620
 #include <foundationdb/fdb_c.h>
 
 #include <free_fdb/iterator.hh>
+#include <utility>
 
 namespace ffdb {
 
 class fdb_exception : public std::exception {
 public:
-  explicit fdb_exception(const std::string& message) : std::exception(), _message(message) {
+  explicit fdb_exception(std::string message) : std::exception(), _message(std::move(message)) {
   }
 
   [[nodiscard]] const char *what() const noexcept override {
@@ -58,13 +60,7 @@ public:
   }
 };
 
-struct fdb_result {
-  std::string key;
-  std::string value;
-};
-
 class free_fdb;
-
 
 /**
  *
@@ -81,9 +77,9 @@ public:
   void put(const std::string &key, const std::string &value);
   void del(const std::string &key);
 
-  std::optional<fdb_result> get(const std::string &key);
+  FDBTransaction *raw() const;
 
-  fdb_iterator make_iterator();
+  std::optional<fdb_result> get(const std::string &key);
 
   //  void del_range(const std::string &from, const std::string &to, std::uint32_t limit);
   //  fdb_iterator get_range(const std::string &from, const std::string &to, std::uint32_t limit);
@@ -104,6 +100,8 @@ public:
   explicit free_fdb(const std::string &cluster_file_path);
 
   std::shared_ptr<fdb_transaction> make_transaction();
+
+  fdb_iterator make_iterator(ffdb::it_options range);
 
 private:
   std::unique_ptr<internal> _impl;
