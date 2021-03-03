@@ -65,9 +65,9 @@ public:
   fdb_iterator(std::shared_ptr<fdb_transaction> transaction, it_options opt);
 
   void operator++();
-  [[nodiscard]] fdb_result operator*() const;
-  [[nodiscard]] std::string value() const;
-  [[nodiscard]] std::string key() const;
+  [[nodiscard]] std::optional<fdb_result> operator*() const;
+  [[nodiscard]] std::optional<std::string> value() const;
+  [[nodiscard]] std::optional<std::string> key() const;
 
   [[nodiscard]] bool is_valid() const;
 

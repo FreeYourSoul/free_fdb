@@ -73,11 +73,12 @@ public:
   explicit fdb_transaction(FDBDatabase *db);
 
   void enable_snapshot();
+  void reset();
 
   void put(const std::string &key, const std::string &value);
   void del(const std::string &key);
 
-  FDBTransaction *raw() const;
+  [[nodiscard]] FDBTransaction *raw() const;
 
   std::optional<fdb_result> get(const std::string &key);
 

@@ -122,4 +122,8 @@ FDBTransaction *fdb_transaction::raw() const {
   return _trans;
 }
 
+void fdb_transaction::reset() {
+  fdb_transaction_reset(_trans);
+}
+
 }// namespace ffdb

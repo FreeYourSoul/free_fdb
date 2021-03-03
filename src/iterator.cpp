@@ -38,6 +38,7 @@ struct fdb_iterator::internal {
 
   int index = 1;
   bool validity = false;
+  bool seeked = false;
 
   std::function<FDBFuture *(void)> seeker;
 };
@@ -51,6 +52,11 @@ fdb_iterator::fdb_iterator(std::shared_ptr<fdb_transaction> t, it_options opt)
 void fdb_iterator::seek(const std::string &key) {
   std::string end = key;
   ++end.back();
+
+  if (_impl->seeked) {
+	_impl->trans->reset();
+  }
+  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -66,6 +72,10 @@ void fdb_iterator::seek(const std::string &key) {
 }
 
 void fdb_iterator::seek_for_prev(const std::string &key) {
+  if (_impl->seeked) {
+	_impl->trans->reset();
+  }
+  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -81,6 +91,10 @@ void fdb_iterator::seek_for_prev(const std::string &key) {
 }
 
 void fdb_iterator::seek_first() {
+  if (_impl->seeked) {
+	_impl->trans->reset();
+  }
+  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -98,6 +112,10 @@ void fdb_iterator::seek_first() {
 }
 
 void fdb_iterator::seek_last() {
+  if (_impl->seeked) {
+	_impl->trans->reset();
+  }
+  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -115,10 +133,26 @@ void fdb_iterator::seek_last() {
 }
 
 void fdb_iterator::next() {
-  if (_impl->validity) {
+  if (is_valid()) {
 	fdb_future fut(_impl->seeker());
-	++_impl->index;
-	_impl->validity = true;
+	fut.get([this](FDBFuture *f) {
+	  const FDBKeyValue *kv;
+	  int index;
+	  fdb_bool_t more;
+	  check_fdb_code(fdb_future_get_keyvalue_array(f, &kv, &index, &more));
+
+	  if (index == 0) {
+		_impl->validity = false;
+		return;
+	  }
+	  index = index - 1;
+
+	  _impl->current_result = fdb_result{
+		  std::string(static_cast<const char *>(kv[index].key), kv[index].key_length),
+		  std::string(static_cast<const char *>(kv[index].value), kv[index].value_length)};
+	  ++_impl->index;
+	  _impl->validity = true;
+	});
   }
 }
 
@@ -126,11 +160,17 @@ bool fdb_iterator::is_valid() const {
   return _impl->validity;
 }
 
-std::string fdb_iterator::value() const {
+std::optional<std::string> fdb_iterator::value() const {
+  if (!is_valid()) {
+	return std::nullopt;
+  }
   return _impl->current_result.value;
 }
 
-std::string fdb_iterator::key() const {
+std::optional<std::string> fdb_iterator::key() const {
+  if (!is_valid()) {
+	return std::nullopt;
+  }
   return _impl->current_result.key;
 }
 
@@ -138,7 +178,10 @@ void fdb_iterator::operator++() {
   next();
 }
 
-fdb_result fdb_iterator::operator*() const {
+std::optional<fdb_result> fdb_iterator::operator*() const {
+  if (!is_valid()) {
+	return std::nullopt;
+  }
   return _impl->current_result;
 }
 
