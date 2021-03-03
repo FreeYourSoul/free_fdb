@@ -95,20 +95,55 @@ fdb_transaction::~fdb_transaction() {
 	fdb_transaction_destroy(_trans);
   }
 }
+
+void fdb_transaction::put(const std::string &key, const std::string &value) {
+  if (_trans) {
+	const auto *key_name = reinterpret_cast<const uint8_t *>(key.c_str());
+	const auto *value_name = reinterpret_cast<const uint8_t *>(value.c_str());
+	fdb_transaction_set(_trans, key_name, key.size(), value_name, value.size());
+  }
+}
+
+void fdb_transaction::del(const std::string &key) {
+  if (_trans) {
+	fdb_transaction_clear(_trans, reinterpret_cast<const uint8_t *>(key.c_str()), key.size());
+  }
+}
+
 std::optional<fdb_result> fdb_transaction::get(const std::string &key) {
   if (_trans) {
 	const auto *key_name = reinterpret_cast<const uint8_t *>(key.c_str());
 	auto fut = fdb_future(fdb_transaction_get(_trans, key_name, key.size(), _snapshot_enabled));
 
 	return fut.get([](FDBFuture *f) -> std::optional<fdb_result> {
-	  	fdb_bool_t out_present;
-	    const uint8_t* out_value;
-	  	int out_value_length;
-		check_fdb_code(fdb_future_get_value(f, &out_present, &out_value, &out_value_length));
+	  fdb_bool_t out_present;
+	  const uint8_t *out_value;
+	  const uint8_t *out_key;
+	  int out_length;
+
+	  check_fdb_code(fdb_future_get_value(f, &out_present, &out_value, &out_length));
+	  std::string value = std::string(reinterpret_cast<const char *>(out_value));
+
+	  check_fdb_code(fdb_future_get_key(f, &out_key, &out_length));
+	  std::string key = std::string(reinterpret_cast<const char *>(out_value));
+	  return fdb_result{std::move(key), std::move(value)};
 	});
   }
   return std::nullopt;
 }
+
+//range_result fdb_transaction::get_range(const std::string &from, const std::string &to, std::uint32_t limit) {
+//  if (_trans) {
+//	const auto *key_name = reinterpret_cast<const uint8_t *>(key.c_str());
+//	auto fut = fdb_future(fdb_transaction_get(_trans, key_name, key.size(), _snapshot_enabled));
+//
+//	return fut.get([](FDBFuture *f) -> range_result {
+//
+//	  return range_result{};
+//	});
+//  }
+//  return range_result{};
+//}
 
 void fdb_transaction::enable_snapshot() {
   _snapshot_enabled = true;

@@ -24,45 +24,47 @@
 #ifndef FREE_FDB_INCLUDE_FREE_DB_FFDB_HH
 #define FREE_FDB_INCLUDE_FREE_DB_FFDB_HH
 
+#include <fmt/format.h>
+
 #include <exception>
 #include <memory>
 
-#include <fmt/format.h>
-
 #include <foundationdb/fdb_c.h>
+
+#include <free_fdb/iterator.hh>
 
 namespace ffdb {
 
 class fdb_exception : public std::exception {
 public:
-  fdb_exception(const char *message) : std::exception(message) {
+  explicit fdb_exception(const std::string& message) : std::exception(), _message(message) {
   }
 
-  virtual const char *what() const throw() {
-	return fmt::format(FMT_STRING("FoundationDB error {}", std::exception::what()));
+  [[nodiscard]] const char *what() const noexcept override {
+	return fmt::format(FMT_STRING("FoundationDB error {}"), std::exception::what()).c_str();
   }
+
+private:
+  std::string _message;
 };
 
 class transaction_exception : public fdb_exception {
 public:
-  transaction_exception(const char *message) : fdb_exception(message) {
+  explicit transaction_exception(const char *message) : fdb_exception(message) {
   }
 
-  const char *what() const throw() {
-	return fmt::format(FMT_STRING("Transaction error {}", fdb_exception::what()));
+  [[nodiscard]] const char *what() const noexcept override {
+	return fmt::format(FMT_STRING("Transaction error {}"), fdb_exception::what()).c_str();
   }
-}
+};
 
 struct fdb_result {
   std::string key;
   std::string value;
 };
 
-struct range_result {
-  std::vector<fdb_result> values;
-};
-
 class free_fdb;
+
 
 /**
  *
@@ -71,17 +73,23 @@ class fdb_transaction {
 
 public:
   ~fdb_transaction();
-  fdb_transaction(const fdb_transaction&) = delete;
+  fdb_transaction(const fdb_transaction &) = delete;
   explicit fdb_transaction(FDBDatabase *db);
 
   void enable_snapshot();
 
+  void put(const std::string &key, const std::string &value);
+  void del(const std::string &key);
+
   std::optional<fdb_result> get(const std::string &key);
 
-  range_result get_range(const std::string &from, const std::string &to, std::uint32_t limit);
+  fdb_iterator make_iterator();
+
+  //  void del_range(const std::string &from, const std::string &to, std::uint32_t limit);
+  //  fdb_iterator get_range(const std::string &from, const std::string &to, std::uint32_t limit);
 
 private:
-  FDBTransaction *_trans{};
+  FDBTransaction *_trans = nullptr;
   bool _snapshot_enabled = false;
 };
 
