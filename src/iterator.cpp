@@ -34,13 +34,13 @@ struct fdb_iterator::internal {
 
   std::shared_ptr<fdb_transaction> trans;
   it_options opt;
-  fdb_result current_result;
+
+  fdb_result current_result{};
 
   int index = 1;
   bool validity = false;
-  bool seeked = false;
 
-  std::function<FDBFuture *(void)> seeker;
+  std::function<FDBFuture *(void)> seeker = nullptr;
 };
 
 fdb_iterator::~fdb_iterator() = default;
@@ -53,10 +53,9 @@ void fdb_iterator::seek(const std::string &key) {
   std::string end = key;
   ++end.back();
 
-  if (_impl->seeked) {
+  if (_impl->seeker) {
 	_impl->trans->reset();
   }
-  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -72,10 +71,9 @@ void fdb_iterator::seek(const std::string &key) {
 }
 
 void fdb_iterator::seek_for_prev(const std::string &key) {
-  if (_impl->seeked) {
+  if (_impl->seeker) {
 	_impl->trans->reset();
   }
-  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -91,10 +89,9 @@ void fdb_iterator::seek_for_prev(const std::string &key) {
 }
 
 void fdb_iterator::seek_first() {
-  if (_impl->seeked) {
+  if (_impl->seeker) {
 	_impl->trans->reset();
   }
-  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -112,10 +109,9 @@ void fdb_iterator::seek_first() {
 }
 
 void fdb_iterator::seek_last() {
-  if (_impl->seeked) {
+  if (_impl->seeker) {
 	_impl->trans->reset();
   }
-  _impl->seeked = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -174,8 +170,9 @@ std::optional<std::string> fdb_iterator::key() const {
   return _impl->current_result.key;
 }
 
-void fdb_iterator::operator++() {
+fdb_iterator &fdb_iterator::operator++() {
   next();
+  return *this;
 }
 
 std::optional<fdb_result> fdb_iterator::operator*() const {

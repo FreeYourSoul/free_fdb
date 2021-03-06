@@ -24,6 +24,7 @@
 #ifndef FREE_FDB_INCLUDE_FREE_FDB_ITERATOR_HH
 #define FREE_FDB_INCLUDE_FREE_FDB_ITERATOR_HH
 
+#include <iterator>
 #include <memory>
 #include <string>
 #include <vector>
@@ -61,11 +62,14 @@ class fdb_iterator {
   struct internal;
 
 public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type        = fdb_result;
+
   ~fdb_iterator();
   fdb_iterator(std::shared_ptr<fdb_transaction> transaction, it_options opt);
 
-  void operator++();
-  [[nodiscard]] std::optional<fdb_result> operator*() const;
+  fdb_iterator& operator++();
+  [[nodiscard]] std::optional<value_type> operator*() const;
   [[nodiscard]] std::optional<std::string> value() const;
   [[nodiscard]] std::optional<std::string> key() const;
 
@@ -78,7 +82,7 @@ public:
   void next();
 
 private:
-	std::unique_ptr<internal> _impl;
+  std::unique_ptr<internal> _impl;
 };
 
 }// namespace ffdb

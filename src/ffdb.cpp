@@ -30,7 +30,7 @@ namespace ffdb {
 struct free_fdb::internal {
 
   explicit internal(const std::string &cluster_file_path) {
-	if (auto error = fdb_create_database(cluster_file_path.c_str(), &db); error) {
+	if (auto error = fdb_create_	database(cluster_file_path.c_str(), &db); error) {
 	  throw fdb_exception(fdb_get_error(error));
 	}
   }
