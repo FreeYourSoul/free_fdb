@@ -20,3 +20,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#include <catch2/catch.hpp>
+
+TEST_CASE("ffdb_testcase_put_get_delete") {
+
+  SECTION("put_get test") {
+
+  }// End section : put_get test
+
+  SECTION("delete test") {
+
+  }// End section : delete test
+
+  SECTION("list test") {
+
+  }// End section : list test
+
+}// End TestCase : ffdb_testcase_put_get_delete
