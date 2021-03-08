@@ -21,21 +21,61 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <mutex>
+#include <thread>
+
 #include <internal/future.hh>
 
 #include <free_fdb/ffdb.hh>
 
 namespace ffdb {
 
+static std::once_flag version_select_flag;
+
 struct free_fdb::internal {
 
   explicit internal(const std::string &cluster_file_path) {
-	if (auto error = fdb_create_	database(cluster_file_path.c_str(), &db); error) {
-	  throw fdb_exception(fdb_get_error(error));
+
+	std::call_once(version_select_flag, [this, &cluster_file_path]() {
+	  if (auto error = fdb_select_api_version(FDB_API_VERSION); error) {
+		throw fdb_exception(fmt::format("Error Selecting version: {}", fdb_get_error(error)));
+	  }
+
+	  // Option debug trace
+	  // fdb_network_set_option(FDBNetworkOption::FDB_NET_OPTION_TRACE_ENABLE, ...)
+
+	  if (auto error = fdb_setup_network(); error) {
+		throw fdb_exception(fmt::format("Error setup network: {}", fdb_get_error(error)));
+	  }
+
+	});
+
+	t = std::thread([]() {
+	  if (auto error = fdb_run_network(); error) {
+		throw fdb_exception(fmt::format("Error while starting network: {}", fdb_get_error(error)));
+	  }
+	});
+
+	if (auto error = fdb_create_database(cluster_file_path.c_str(), &db); error) {
+	  throw fdb_exception(fmt::format("Error creating DB: {}", fdb_get_error(error)));
+	}
+
+  }
+
+  ~internal() {
+	auto err = fdb_stop_network();
+	if (err) {
+	  /* An error occurred (probably network not running) */
+	  fmt::print("Error while stopping network");
+	}
+	if (t.joinable()) {
+	  t.join();
 	}
   }
 
   FDBDatabase *db{};
+
+  std::thread t;
 };
 
 free_fdb::~free_fdb() {
@@ -47,8 +87,8 @@ free_fdb::~free_fdb() {
 free_fdb::free_fdb(const std::string &cluster_file_path) : _impl(std::make_unique<internal>(cluster_file_path)) {
 }
 
-std::shared_ptr<fdb_transaction> free_fdb::make_transaction() {
-  return std::make_shared<fdb_transaction>(_impl->db);
+std::unique_ptr<fdb_transaction> free_fdb::make_transaction() {
+  return std::make_unique<fdb_transaction>(_impl->db);
 }
 
 fdb_iterator free_fdb::make_iterator(it_options range) {
@@ -84,18 +124,18 @@ std::optional<fdb_result> fdb_transaction::get(const std::string &key) {
 	const auto *key_name = reinterpret_cast<const uint8_t *>(key.c_str());
 	auto fut = fdb_future(fdb_transaction_get(_trans, key_name, key.size(), _snapshot_enabled));
 
-	return fut.get([](FDBFuture *f) -> std::optional<fdb_result> {
+	return fut.get([&key](FDBFuture *f) -> std::optional<fdb_result> {
 	  fdb_bool_t out_present;
 	  const uint8_t *out_value;
-	  const uint8_t *out_key;
 	  int out_length;
 
 	  check_fdb_code(fdb_future_get_value(f, &out_present, &out_value, &out_length));
-	  std::string value = std::string(reinterpret_cast<const char *>(out_value));
+	  std::string value = std::string(reinterpret_cast<const char *>(out_value), out_length);
 
-	  check_fdb_code(fdb_future_get_key(f, &out_key, &out_length));
-	  std::string key = std::string(reinterpret_cast<const char *>(out_value));
-	  return fdb_result{std::move(key), std::move(value)};
+	  if (!out_present)
+		return std::nullopt;
+
+	  return fdb_result{key, std::move(value)};
 	});
   }
   return std::nullopt;
@@ -124,6 +164,10 @@ FDBTransaction *fdb_transaction::raw() const {
 
 void fdb_transaction::reset() {
   fdb_transaction_reset(_trans);
+}
+
+void fdb_transaction::commit() {
+	fdb_future(fdb_transaction_commit(_trans)).get();
 }
 
 }// namespace ffdb

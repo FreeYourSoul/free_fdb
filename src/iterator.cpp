@@ -139,7 +139,7 @@ void fdb_iterator::next() {
 
 	  if (index == 0) {
 		_impl->validity = false;
-		return;
+		return std::nullopt;
 	  }
 	  index = index - 1;
 
@@ -148,6 +148,7 @@ void fdb_iterator::next() {
 		  std::string(static_cast<const char *>(kv[index].value), kv[index].value_length)};
 	  ++_impl->index;
 	  _impl->validity = true;
+	  return std::nullopt;
 	});
   }
 }

@@ -28,12 +28,12 @@
 
 namespace ffdb {
 
-void check_fdb_code(fdb_error_t error) {
+static void check_fdb_code(fdb_error_t error) {
   if (error != 0) {
 	if (fdb_error_predicate(FDBErrorPredicate::FDB_ERROR_PREDICATE_RETRYABLE, error)) {
-	  throw transaction_exception(fdb_get_error(error));
+	  throw transaction_exception(fmt::format("Future, Non retry-able error : {}", fdb_get_error(error)));
 	}
-	throw fdb_exception(fdb_get_error(error));
+	throw fdb_exception(fmt::format("Future, Other error : {}", fdb_get_error(error)));
   }
 }
 
@@ -50,14 +50,19 @@ public:
   }
 
   template<typename Handler>
-  auto get(Handler &&handler) {
+  std::optional<fdb_result> get(Handler &&handler) {
 	if (_data) {
 	  if (auto error = fdb_future_block_until_ready(_data); error != 0) {
-		throw fdb_exception(fdb_get_error(error));
+		throw fdb_exception(fmt::format("Error on future block : {}", fdb_get_error(error)));
 	  }
 	  check_fdb_code(fdb_future_get_error(_data));
 	  return std::forward<Handler>(handler)(_data);
 	}
+	return std::nullopt;
+  }
+
+  void get() {
+	get([](FDB_future*){return std::optional<fdb_result>{}; });
   }
 
 private:

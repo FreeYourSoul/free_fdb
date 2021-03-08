@@ -43,7 +43,7 @@ public:
   }
 
   [[nodiscard]] const char *what() const noexcept override {
-	return fmt::format(FMT_STRING("FoundationDB error {}"), std::exception::what()).c_str();
+	return _message.c_str();
   }
 
 private:
@@ -52,11 +52,7 @@ private:
 
 class transaction_exception : public fdb_exception {
 public:
-  explicit transaction_exception(const char *message) : fdb_exception(message) {
-  }
-
-  [[nodiscard]] const char *what() const noexcept override {
-	return fmt::format(FMT_STRING("Transaction error {}"), fdb_exception::what()).c_str();
+  explicit transaction_exception(std::string message) : fdb_exception(std::move(message)) {
   }
 };
 
@@ -73,6 +69,7 @@ public:
   explicit fdb_transaction(FDBDatabase *db);
 
   void enable_snapshot();
+  void commit();
   void reset();
 
   void put(const std::string &key, const std::string &value);
@@ -100,7 +97,7 @@ public:
   ~free_fdb();
   explicit free_fdb(const std::string &cluster_file_path);
 
-  std::shared_ptr<fdb_transaction> make_transaction();
+  std::unique_ptr<fdb_transaction> make_transaction();
 
   fdb_iterator make_iterator(ffdb::it_options range);
 

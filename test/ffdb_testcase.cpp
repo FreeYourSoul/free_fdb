@@ -23,18 +23,88 @@
 
 #include <catch2/catch.hpp>
 
+#include <thread>
+
+#include <free_fdb/ffdb.hh>
+
 TEST_CASE("ffdb_testcase_put_get_delete") {
 
+  // static, only one instance need to be done, re-starting network doesn't work well with foundationdb
+  // https://github.com/apple/foundationdb/issues/2981
+  static auto ffdb = ffdb::free_fdb("/etc/foundationdb/fdb.cluster");
+
   SECTION("put_get test") {
+	auto trans = ffdb.make_transaction();
+	  trans->put("key_1", "value_1");
+	  trans->put("key_2", "value_2");
+	  trans->put("key_3", "value_3");
+	  trans->put("key_4", "value_4");
+
+	auto kv1 = trans->get("key_1");
+	auto kv2 = trans->get("key_2");
+	auto kv3 = trans->get("key_3");
+	auto kv4 = trans->get("key_4");
+
+	CHECK(kv1.has_value());
+	CHECK(kv2.has_value());
+	CHECK(kv3.has_value());
+	CHECK(kv4.has_value());
+
+	CHECK(kv1->key == "key_1");
+	CHECK(kv1->value == "value_1");
+
+	CHECK(kv2->key == "key_2");
+	CHECK(kv2->value == "value_2");
+
+	CHECK(kv3->key == "key_3");
+	CHECK(kv3->value == "value_3");
+
+	CHECK(kv4->key == "key_4");
+	CHECK(kv4->value == "value_4");
+
+	auto kv_not_found = trans->get("NOT_FOUND");
+	CHECK_FALSE(kv_not_found.has_value());
 
   }// End section : put_get test
 
-  SECTION("delete test") {
+  SECTION("None found (not committed before)") {
+//	std::this_thread::sleep_for(std::chrono::seconds(1));
+	auto trans = ffdb.make_transaction();
+	auto kv_not_found = trans->get("key_1");
 
-  }// End section : delete test
+	CHECK_FALSE(kv_not_found.has_value());
+  }// End section : None found (not committed before)
+
+  SECTION("commit test") {
+	auto trans = ffdb.make_transaction();
+
+	trans->put("key_1", "value_1");
+	trans->put("key_2", "value_2");
+	trans->put("key_3", "value_3");
+	trans->put("key_4", "value_4");
+
+	{
+//	  auto trans2 = ffdb.make_transaction();
+//	  auto key_1 = trans2->get("key_1");
+//	  auto key_2 = trans2->get("key_2");
+//	  auto key_3 = trans2->get("key_3");
+//	  auto key_4 = trans2->get("key_4");
+//	  CHECK_FALSE(key_1.has_value());
+//	  CHECK_FALSE(key_2.has_value());
+//	  CHECK_FALSE(key_3.has_value());
+//	  CHECK_FALSE(key_4.has_value());
+	}
+//	trans->commit();
+
+	SECTION("delete test") {
+
+	}// End section : delete test
+
+  }// End section : test commit
 
   SECTION("list test") {
 
   }// End section : list test
+
 
 }// End TestCase : ffdb_testcase_put_get_delete
