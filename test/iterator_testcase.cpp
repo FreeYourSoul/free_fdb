@@ -20,3 +20,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#include <catch2/catch.hpp>
+
+#include <thread>
+#include <mutex>
+
+#include <free_fdb/ffdb.hh>
+
+TEST_CASE("iterator_testcase", "[db_test]") {
+
+}// End TestCase : iterator_testcase

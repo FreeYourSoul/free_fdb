@@ -47,7 +47,6 @@ struct free_fdb::internal {
 	  if (auto error = fdb_setup_network(); error) {
 		throw fdb_exception(fmt::format("Error setup network: {}", fdb_get_error(error)));
 	  }
-
 	});
 
 	t = std::thread([]() {
@@ -59,7 +58,6 @@ struct free_fdb::internal {
 	if (auto error = fdb_create_database(cluster_file_path.c_str(), &db); error) {
 	  throw fdb_exception(fmt::format("Error creating DB: {}", fdb_get_error(error)));
 	}
-
   }
 
   ~internal() {
@@ -119,6 +117,15 @@ void fdb_transaction::del(const std::string &key) {
   }
 }
 
+void fdb_transaction::del_range(const std::string &key_begin, const std::string &key_end) {
+  if (_trans) {
+	fdb_transaction_clear_range(
+		_trans,
+		reinterpret_cast<const uint8_t *>(key_begin.c_str()), key_begin.size(),
+		reinterpret_cast<const uint8_t *>(key_end.c_str()), key_end.size());
+  }
+}
+
 std::optional<fdb_result> fdb_transaction::get(const std::string &key) {
   if (_trans) {
 	const auto *key_name = reinterpret_cast<const uint8_t *>(key.c_str());
@@ -167,7 +174,7 @@ void fdb_transaction::reset() {
 }
 
 void fdb_transaction::commit() {
-	fdb_future(fdb_transaction_commit(_trans)).get();
+  fdb_future(fdb_transaction_commit(_trans)).get();
 }
 
 }// namespace ffdb

@@ -74,12 +74,12 @@ public:
 
   void put(const std::string &key, const std::string &value);
   void del(const std::string &key);
+  void del_range(const std::string& key_begin, const std::string& key_end);
 
   [[nodiscard]] FDBTransaction *raw() const;
 
   std::optional<fdb_result> get(const std::string &key);
 
-  //  void del_range(const std::string &from, const std::string &to, std::uint32_t limit);
   //  fdb_iterator get_range(const std::string &from, const std::string &to, std::uint32_t limit);
 
 private:

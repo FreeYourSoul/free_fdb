@@ -24,14 +24,22 @@
 #include <catch2/catch.hpp>
 
 #include <thread>
+#include <mutex>
 
 #include <free_fdb/ffdb.hh>
+
+std::once_flag once;
 
 TEST_CASE("ffdb_testcase_put_get_delete") {
 
   // static, only one instance need to be done, re-starting network doesn't work well with foundationdb
   // https://github.com/apple/foundationdb/issues/2981
   static auto ffdb = ffdb::free_fdb("/etc/foundationdb/fdb.cluster");
+  // full clear db for test
+  std::call_once(once, [trans = ffdb.make_transaction()](){
+	trans->del_range("", "\xFF");
+	trans->commit();
+  });
 
   SECTION("put_get test") {
 	auto trans = ffdb.make_transaction();
@@ -69,10 +77,10 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 
   SECTION("None found (not committed before)") {
 //	std::this_thread::sleep_for(std::chrono::seconds(1));
-	auto trans = ffdb.make_transaction();
-	auto kv_not_found = trans->get("key_1");
+	auto t = ffdb.make_transaction();
+	auto k = t->get("key_1");
 
-	CHECK_FALSE(kv_not_found.has_value());
+	CHECK_FALSE(k.has_value());
   }// End section : None found (not committed before)
 
   SECTION("commit test") {
@@ -84,19 +92,53 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 	trans->put("key_4", "value_4");
 
 	{
-//	  auto trans2 = ffdb.make_transaction();
-//	  auto key_1 = trans2->get("key_1");
-//	  auto key_2 = trans2->get("key_2");
-//	  auto key_3 = trans2->get("key_3");
-//	  auto key_4 = trans2->get("key_4");
-//	  CHECK_FALSE(key_1.has_value());
-//	  CHECK_FALSE(key_2.has_value());
-//	  CHECK_FALSE(key_3.has_value());
-//	  CHECK_FALSE(key_4.has_value());
+	  auto trans2 = ffdb.make_transaction();
+	  auto key_1 = trans2->get("key_1");
+	  auto key_2 = trans2->get("key_2");
+	  auto key_3 = trans2->get("key_3");
+	  auto key_4 = trans2->get("key_4");
+	  CHECK_FALSE(key_1.has_value());
+	  CHECK_FALSE(key_2.has_value());
+	  CHECK_FALSE(key_3.has_value());
+	  CHECK_FALSE(key_4.has_value());
 	}
-//	trans->commit();
+	trans->commit();
+
+	{
+	  auto trans2 = ffdb.make_transaction();
+	  auto key_1 = trans2->get("key_1");
+	  auto key_2 = trans2->get("key_2");
+	  auto key_3 = trans2->get("key_3");
+	  auto key_4 = trans2->get("key_4");
+	  CHECK(key_1.has_value());
+	  CHECK(key_2.has_value());
+	  CHECK(key_3.has_value());
+	  CHECK(key_4.has_value());
+	}
 
 	SECTION("delete test") {
+
+	  auto trans_del = ffdb.make_transaction();
+
+	  trans_del->del("key_1");
+	  trans_del->del("key_2");
+	  trans_del->del("key_3");
+
+	  auto key_1 = trans_del->get("key_1");
+	  auto key_2 = trans_del->get("key_2");
+	  auto key_3 = trans_del->get("key_3");
+	  auto key_4 = trans_del->get("key_4");
+
+	  CHECK_FALSE(key_1.has_value());
+	  CHECK_FALSE(key_2.has_value());
+	  CHECK_FALSE(key_3.has_value());
+	  CHECK(key_4.has_value());
+
+	  trans_del->del("key_4");
+	  key_4 = trans_del->get("key_4");
+	  CHECK_FALSE(key_4.has_value());
+
+	  // delete not committed for the next test to be able to proceed properly
 
 	}// End section : delete test
 
