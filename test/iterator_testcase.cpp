@@ -24,9 +24,6 @@
 #include <catch2/catch.hpp>
 
 #include <thread>
-#include <mutex>
-
-#include <free_fdb/ffdb.hh>
 
 TEST_CASE("iterator_testcase", "[db_test]") {
 

@@ -1,7 +1,7 @@
 // MIT License
 //
 // Copyright (c) 2021 Quentin Balland
-// Repository : https://github.com/FreeYourSoul/FyS
+// Repository : https://github.com/FreeYourSoul/free_fdb
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 //         of this software and associated documentation files (the "Software"), to deal
@@ -33,25 +33,35 @@ namespace ffdb {
 
 class fdb_transaction;
 
+/**
+ *
+ */
 struct it_options {
   std::string iterate_lower_bound;
   std::string iterate_upper_bound;
 
   //! if set to 0, no maximum is set, otherwise iteration stop when equal to the maximum iteration
-  int iterate_limit = 0;
+  int limit = 0;
   //! max byte size from a range
-  int iterate_max = 0;
+  int max = 0;
 
   fdb_bool_t snapshot = 0;
 };
 
+/**
+ *
+ */
 struct fdb_result {
   std::string key;
   std::string value;
 };
 
+/**
+ *
+ */
 struct range_result {
   std::vector<fdb_result> values;
+  bool truncated;
 };
 
 /**
@@ -68,17 +78,61 @@ public:
   ~fdb_iterator();
   fdb_iterator(std::shared_ptr<fdb_transaction> transaction, it_options opt);
 
+  /**
+   *
+   * @return
+   */
   fdb_iterator& operator++();
+
+  /**
+   *
+   * @return
+   */
   [[nodiscard]] std::optional<value_type> operator*() const;
+
+  /**
+   *
+   * @return
+   */
   [[nodiscard]] std::optional<std::string> value() const;
+
+  /**
+   *
+   * @return
+   */
   [[nodiscard]] std::optional<std::string> key() const;
 
+  /**
+   *
+   * @return
+   */
   [[nodiscard]] bool is_valid() const;
 
+  /**
+   *
+   * @param key
+   */
   void seek(const std::string &key);
+
+  /**
+   *
+   * @param key
+   */
   void seek_for_prev(const std::string &key);
+
+  /**
+   *
+   */
   void seek_first();
+
+  /**
+   *
+   */
   void seek_last();
+
+  /*
+   *
+   */
   void next();
 
 private:

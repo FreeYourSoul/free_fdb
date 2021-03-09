@@ -21,54 +21,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef FREE_FDB_INCLUDE_INTERNAL_FUTURE_HH
-#define FREE_FDB_INCLUDE_INTERNAL_FUTURE_HH
+#include <catch2/catch.hpp>
 
 #include <free_fdb/ffdb.hh>
 
-namespace ffdb {
+TEST_CASE("counter_testcase") {
 
-static void check_fdb_code(fdb_error_t error) {
-  if (error != 0) {
-	if (fdb_error_predicate(FDBErrorPredicate::FDB_ERROR_PREDICATE_RETRYABLE, error)) {
-	  throw transaction_exception(fmt::format("Future, Non retry-able error : {}", fdb_get_error(error)));
-	}
-	throw fdb_exception(fmt::format("Future, Other error : {}", fdb_get_error(error)));
-  }
-}
+  SECTION("add test") {
 
-class fdb_future {
-public:
-  ~fdb_future() {
-	if (_data) {
-	  fdb_future_destroy(_data);
-	}
-  }
-  fdb_future(const fdb_future &) = delete;
+  }// End section : add test
 
-  explicit fdb_future(FDBFuture *fut) : _data(fut) {
-  }
+  SECTION("sub test") {
 
-  template<typename Handler>
-  auto get(Handler &&handler) {
-	if (!_data) {
-	  throw fdb_exception("Error: Future data is null and thus cant be awaited.");
-	}
-	if (auto error = fdb_future_block_until_ready(_data); error != 0) {
-	  throw fdb_exception(fmt::format("Error on future block : {}", fdb_get_error(error)));
-	}
-	check_fdb_code(fdb_future_get_error(_data));
-	return std::forward<Handler>(handler)(_data);
-  }
+  }// End section : sub test
 
-  void get() {
-	get([](FDB_future *) { return std::optional<fdb_result>{}; });
-  }
+  SECTION("combined") {
 
-private:
-  FDBFuture *_data;
-};
+  }// End section : combined
 
-}// namespace ffdb
+  SECTION("parallel") {
 
-#endif//FREE_FDB_INCLUDE_INTERNAL_FUTURE_HH
+  }// End section : parallel
+
+}// End TestCase : counter_testcase

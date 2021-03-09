@@ -1,7 +1,7 @@
 // MIT License
 //
 // Copyright (c) 2021 Quentin Balland
-// Repository : https://github.com/FreeYourSoul/FyS
+// Repository : https://github.com/FreeYourSoul/free_fdb
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 //         of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,17 @@
 #include <free_fdb/ffdb.hh>
 #include <free_fdb/iterator.hh>
 
+namespace {
+
+constexpr fdb_bool_t not_reversed() {
+  return fdb_bool_t{0};
+}
+
+constexpr fdb_bool_t reversed() {
+  return fdb_bool_t{1};
+}
+
+}// namespace
 namespace ffdb {
 
 struct fdb_iterator::internal {
@@ -61,11 +72,11 @@ void fdb_iterator::seek(const std::string &key) {
 		_impl->trans->raw(),
 
 		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(key.c_str()), key.size()),
-		FDB_KEYSEL_LAST_LESS_OR_EQUAL(reinterpret_cast<const uint8_t *>(end.c_str()), end.size()),
+		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(end.c_str()), end.size()),
 
-		_impl->opt.iterate_limit, _impl->opt.iterate_max,
+		_impl->opt.limit, _impl->opt.max,
 		FDBStreamingMode::FDB_STREAMING_MODE_ITERATOR, _impl->index,
-		_impl->opt.snapshot, fdb_bool_t{0});
+		_impl->opt.snapshot, not_reversed());
   };
   next();
 }
@@ -79,11 +90,11 @@ void fdb_iterator::seek_for_prev(const std::string &key) {
 		_impl->trans->raw(),
 
 		reinterpret_cast<const uint8_t *>(key.c_str()), key.size(), 0, -1,
-		FDB_KEYSEL_LAST_LESS_THAN(reinterpret_cast<const uint8_t *>(key.c_str()), key.size()),
+		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(key.c_str()), key.size()),
 
-		_impl->opt.iterate_limit, _impl->opt.iterate_max,
+		_impl->opt.limit, _impl->opt.max,
 		FDBStreamingMode::FDB_STREAMING_MODE_ITERATOR, _impl->index,
-		_impl->opt.snapshot, fdb_bool_t{0});
+		_impl->opt.snapshot, not_reversed());
   };
   next();
 }
@@ -98,12 +109,12 @@ void fdb_iterator::seek_first() {
 
 		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(
 			reinterpret_cast<const uint8_t *>(_impl->opt.iterate_lower_bound.c_str()), _impl->opt.iterate_lower_bound.size()),
-		FDB_KEYSEL_LAST_LESS_OR_EQUAL(
+		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(
 			reinterpret_cast<const uint8_t *>(_impl->opt.iterate_upper_bound.c_str()), _impl->opt.iterate_upper_bound.size()),
 
-		_impl->opt.iterate_limit, _impl->opt.iterate_max,
+		_impl->opt.limit, _impl->opt.max,
 		FDBStreamingMode::FDB_STREAMING_MODE_ITERATOR, _impl->index,
-		_impl->opt.snapshot, fdb_bool_t{0});
+		_impl->opt.snapshot, not_reversed());
   };
   next();
 }
@@ -118,12 +129,12 @@ void fdb_iterator::seek_last() {
 
 		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(
 			reinterpret_cast<const uint8_t *>(_impl->opt.iterate_lower_bound.c_str()), _impl->opt.iterate_lower_bound.size()),
-		FDB_KEYSEL_LAST_LESS_OR_EQUAL(
+		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(
 			reinterpret_cast<const uint8_t *>(_impl->opt.iterate_upper_bound.c_str()), _impl->opt.iterate_upper_bound.size()),
 
-		_impl->opt.iterate_limit, _impl->opt.iterate_max,
+		_impl->opt.limit, _impl->opt.max,
 		FDBStreamingMode::FDB_STREAMING_MODE_ITERATOR, _impl->index,
-		_impl->opt.snapshot, fdb_bool_t{1});
+		_impl->opt.snapshot, reversed());
   };
   next();
 }
