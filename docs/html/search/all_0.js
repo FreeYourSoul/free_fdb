@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['internal_0',['internal',['../structffdb_1_1free__fdb_1_1internal.html',1,'ffdb::free_fdb::internal'],['../structffdb_1_1fdb__iterator_1_1internal.html',1,'ffdb::fdb_iterator::internal']]]
+  ['add_0',['add',['../da/d32/classffdb_1_1fdb__counter.html#af9cbe0b6f1414b9d32c999f0819a5ca2',1,'ffdb::fdb_counter']]]
 ];

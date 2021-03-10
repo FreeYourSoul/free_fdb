@@ -1,0 +1,165 @@
+\hypertarget{classffdb_1_1fdb__iterator}{}\doxysection{ffdb\+::fdb\+\_\+iterator Class Reference}
+\label{classffdb_1_1fdb__iterator}\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structffdb_1_1fdb__iterator_1_1internal}{internal}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a3419e44ad3d45d75ed8bb4e4cb8e2f08}\label{classffdb_1_1fdb__iterator_a3419e44ad3d45d75ed8bb4e4cb8e2f08}} 
+using {\bfseries iterator\+\_\+category} = std\+::forward\+\_\+iterator\+\_\+tag
+\item 
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_ac625bf1c3e9be9bcb757fe782bfc22a3}\label{classffdb_1_1fdb__iterator_ac625bf1c3e9be9bcb757fe782bfc22a3}} 
+using {\bfseries value\+\_\+type} = \mbox{\hyperlink{structffdb_1_1fdb__result}{fdb\+\_\+result}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a73c118eb28057b0cef7249f955e9eb55}\label{classffdb_1_1fdb__iterator_a73c118eb28057b0cef7249f955e9eb55}} 
+{\bfseries fdb\+\_\+iterator} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classffdb_1_1fdb__transaction}{fdb\+\_\+transaction}} $>$ transaction, \mbox{\hyperlink{structffdb_1_1it__options}{it\+\_\+options}} opt)
+\item 
+\mbox{\hyperlink{classffdb_1_1fdb__iterator}{fdb\+\_\+iterator}} \& \mbox{\hyperlink{classffdb_1_1fdb__iterator_a4818f6bb86623b24b0901ec0b66c5a62}{operator++}} ()
+\item 
+const \mbox{\hyperlink{structffdb_1_1fdb__result}{value\+\_\+type}} \& \mbox{\hyperlink{classffdb_1_1fdb__iterator_a7864516c913bd0c49ccec0df522912d4}{operator$\ast$}} () const
+\item 
+const \mbox{\hyperlink{structffdb_1_1fdb__result}{value\+\_\+type}} $\ast$ \mbox{\hyperlink{classffdb_1_1fdb__iterator_ac758b87aadcd46dc9c3634b20604fd72}{operator-\/$>$}} () const
+\item 
+const std\+::string \& \mbox{\hyperlink{classffdb_1_1fdb__iterator_afe8796a00c42b74da2625081bb6b78a1}{value}} () const
+\item 
+const std\+::string \& \mbox{\hyperlink{classffdb_1_1fdb__iterator_a602521449e89a6e6f42879e746cd1e97}{key}} () const
+\item 
+bool \mbox{\hyperlink{classffdb_1_1fdb__iterator_afcca4895ce00dd7232edc1be18cb36dc}{is\+\_\+valid}} () const
+\item 
+void \mbox{\hyperlink{classffdb_1_1fdb__iterator_a6cd22d757291d8f7bbf9a20d2157f152}{seek}} (std\+::string \mbox{\hyperlink{classffdb_1_1fdb__iterator_a602521449e89a6e6f42879e746cd1e97}{key}})
+\item 
+void \mbox{\hyperlink{classffdb_1_1fdb__iterator_adbba0f025ce889e3e2a3bf30c4e904d5}{seek\+\_\+for\+\_\+prev}} (std\+::string \mbox{\hyperlink{classffdb_1_1fdb__iterator_a602521449e89a6e6f42879e746cd1e97}{key}})
+\item 
+void \mbox{\hyperlink{classffdb_1_1fdb__iterator_a4789ff2e7e9f8a1c93266b8a90f36829}{seek\+\_\+first}} ()
+\item 
+void \mbox{\hyperlink{classffdb_1_1fdb__iterator_acc98a73ab2b1e59549ebb4d66a9b8684}{seek\+\_\+last}} ()
+\item 
+void \mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_afcca4895ce00dd7232edc1be18cb36dc}\label{classffdb_1_1fdb__iterator_afcca4895ce00dd7232edc1be18cb36dc}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!is\_valid@{is\_valid}}
+\index{is\_valid@{is\_valid}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{is\_valid()}{is\_valid()}}
+{\footnotesize\ttfamily bool ffdb\+::fdb\+\_\+iterator\+::is\+\_\+valid (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+Check if the iterator an be consumed from (\mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next()}} method call).
+
+\begin{DoxyReturn}{Returns}
+true if the iterator is not fully consumed yet 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a602521449e89a6e6f42879e746cd1e97}\label{classffdb_1_1fdb__iterator_a602521449e89a6e6f42879e746cd1e97}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!key@{key}}
+\index{key@{key}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{key()}{key()}}
+{\footnotesize\ttfamily const std\+::string \& ffdb\+::fdb\+\_\+iterator\+::key (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+key of the key/value pair the iterator currently hold 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}\label{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!next@{next}}
+\index{next@{next}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{next()}{next()}}
+{\footnotesize\ttfamily void ffdb\+::fdb\+\_\+iterator\+::next (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Make the iterator go to the next element, if no such element exists or if the range is going beyond the options set at construction time of the iterator, validity of the iterator is impacted (\mbox{\hyperlink{classffdb_1_1fdb__iterator_afcca4895ce00dd7232edc1be18cb36dc}{is\+\_\+valid()}} return false)
+
+Going forward or backward (lexicographically speaking) depend on the seek that has been selected. Refer to the documentation of the seeking method you use in order to know if it goes forward or backward
+
+Applying next to an invalid iterator do nothing. \mbox{\Hypertarget{classffdb_1_1fdb__iterator_a7864516c913bd0c49ccec0df522912d4}\label{classffdb_1_1fdb__iterator_a7864516c913bd0c49ccec0df522912d4}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{operator$\ast$()}{operator*()}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{structffdb_1_1fdb__result}{fdb\+\_\+result}} \& ffdb\+::fdb\+\_\+iterator\+::operator$\ast$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+the key/value pair the iterator currently hold 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a4818f6bb86623b24b0901ec0b66c5a62}\label{classffdb_1_1fdb__iterator_a4818f6bb86623b24b0901ec0b66c5a62}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!operator++@{operator++}}
+\index{operator++@{operator++}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classffdb_1_1fdb__iterator}{fdb\+\_\+iterator}} \& ffdb\+::fdb\+\_\+iterator\+::operator++ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Same as calling next \begin{DoxyReturn}{Returns}
+a reference to the current iterator 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_ac758b87aadcd46dc9c3634b20604fd72}\label{classffdb_1_1fdb__iterator_ac758b87aadcd46dc9c3634b20604fd72}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{structffdb_1_1fdb__result}{fdb\+\_\+iterator\+::value\+\_\+type}} $\ast$ ffdb\+::fdb\+\_\+iterator\+::operator-\/$>$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+the key/value pair the iterator currently hold 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a6cd22d757291d8f7bbf9a20d2157f152}\label{classffdb_1_1fdb__iterator_a6cd22d757291d8f7bbf9a20d2157f152}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!seek@{seek}}
+\index{seek@{seek}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{seek()}{seek()}}
+{\footnotesize\ttfamily void ffdb\+::fdb\+\_\+iterator\+::seek (\begin{DoxyParamCaption}\item[{std\+::string}]{key }\end{DoxyParamCaption})}
+
+Seek for the key provided From there, goes forward (lexicographically speaking) after each \mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next()}} call
+
+If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & to look for in foundationdb \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_a4789ff2e7e9f8a1c93266b8a90f36829}\label{classffdb_1_1fdb__iterator_a4789ff2e7e9f8a1c93266b8a90f36829}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!seek\_first@{seek\_first}}
+\index{seek\_first@{seek\_first}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{seek\_first()}{seek\_first()}}
+{\footnotesize\ttfamily void ffdb\+::fdb\+\_\+iterator\+::seek\+\_\+first (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Seek for the first element in the range from the options set at construction time of the iterator. From there, goes forward (lexicographically speaking) after each \mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next()}} call
+
+If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held \mbox{\Hypertarget{classffdb_1_1fdb__iterator_adbba0f025ce889e3e2a3bf30c4e904d5}\label{classffdb_1_1fdb__iterator_adbba0f025ce889e3e2a3bf30c4e904d5}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!seek\_for\_prev@{seek\_for\_prev}}
+\index{seek\_for\_prev@{seek\_for\_prev}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{seek\_for\_prev()}{seek\_for\_prev()}}
+{\footnotesize\ttfamily void ffdb\+::fdb\+\_\+iterator\+::seek\+\_\+for\+\_\+prev (\begin{DoxyParamCaption}\item[{std\+::string}]{key }\end{DoxyParamCaption})}
+
+Seek for the previous key before the one provided From there, goes backward (lexicographically speaking) after each \mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next()}} call
+
+If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & to find the previous key from in foundationdb \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classffdb_1_1fdb__iterator_acc98a73ab2b1e59549ebb4d66a9b8684}\label{classffdb_1_1fdb__iterator_acc98a73ab2b1e59549ebb4d66a9b8684}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!seek\_last@{seek\_last}}
+\index{seek\_last@{seek\_last}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{seek\_last()}{seek\_last()}}
+{\footnotesize\ttfamily void ffdb\+::fdb\+\_\+iterator\+::seek\+\_\+last (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Seek for the last element in the range from the options set at construction time of the iterator. From there, goes backward (lexicographically speaking) after each \mbox{\hyperlink{classffdb_1_1fdb__iterator_a949a42ad688fff1aefb0cd9d694b6af5}{next()}} call
+
+If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held \mbox{\Hypertarget{classffdb_1_1fdb__iterator_afe8796a00c42b74da2625081bb6b78a1}\label{classffdb_1_1fdb__iterator_afe8796a00c42b74da2625081bb6b78a1}} 
+\index{ffdb::fdb\_iterator@{ffdb::fdb\_iterator}!value@{value}}
+\index{value@{value}!ffdb::fdb\_iterator@{ffdb::fdb\_iterator}}
+\doxysubsubsection{\texorpdfstring{value()}{value()}}
+{\footnotesize\ttfamily const std\+::string \& ffdb\+::fdb\+\_\+iterator\+::value (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+\begin{DoxyReturn}{Returns}
+value of the key/value pair the iterator currently hold 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/free\+\_\+fdb/iterator.\+hh\item 
+src/iterator.\+cpp\end{DoxyCompactItemize}

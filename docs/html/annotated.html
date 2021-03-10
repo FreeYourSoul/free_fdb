@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Project: Class List</title>
+<title>free_fdb: Class List</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,8 +21,9 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">My Project
+   <div id="projectname">free_fdb
    </div>
+   <div id="projectbrief">C++ binding for foundationdb</div>
   </td>
  </tr>
  </tbody>
@@ -68,10 +69,19 @@ $(function() {
 <div class="textblock">Here are the classes, structs, unions and interfaces with brief descriptions:</div><div class="directory">
 <div class="levels">[detail level <span onclick="javascript:toggleLevel(1);">1</span><span onclick="javascript:toggleLevel(2);">2</span><span onclick="javascript:toggleLevel(3);">3</span>]</div><table class="directory">
 <tr id="row_0_" class="even"><td class="entry"><span style="width:0px;display:inline-block;">&#160;</span><span id="arr_0_" class="arrow" onclick="toggleFolder('0_')">&#9660;</span><span class="icona"><span class="icon">N</span></span><b>ffdb</b></td><td class="desc"></td></tr>
-<tr id="row_0_0_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span id="arr_0_0_" class="arrow" onclick="toggleFolder('0_0_')">&#9660;</span><span class="icona"><span class="icon">N</span></span><b>fdb_iterator</b></td><td class="desc"></td></tr>
-<tr id="row_0_0_0_" class="even"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structffdb_1_1fdb__iterator_1_1internal.html" target="_self">internal</a></td><td class="desc"></td></tr>
-<tr id="row_0_1_"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span id="arr_0_1_" class="arrow" onclick="toggleFolder('0_1_')">&#9660;</span><span class="icona"><span class="icon">N</span></span><b>free_fdb</b></td><td class="desc"></td></tr>
-<tr id="row_0_1_0_" class="even"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="structffdb_1_1free__fdb_1_1internal.html" target="_self">internal</a></td><td class="desc"></td></tr>
+<tr id="row_0_0_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="da/d32/classffdb_1_1fdb__counter.html" target="_self">fdb_counter</a></td><td class="desc"></td></tr>
+<tr id="row_0_1_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="da/d1b/classffdb_1_1fdb__exception.html" target="_self">fdb_exception</a></td><td class="desc"></td></tr>
+<tr id="row_0_2_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d6/de6/classffdb_1_1fdb__future.html" target="_self">fdb_future</a></td><td class="desc"></td></tr>
+<tr id="row_0_3_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span id="arr_0_3_" class="arrow" onclick="toggleFolder('0_3_')">&#9660;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="de/d7a/classffdb_1_1fdb__iterator.html" target="_self">fdb_iterator</a></td><td class="desc"></td></tr>
+<tr id="row_0_3_0_"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="dd/d8a/structffdb_1_1fdb__iterator_1_1internal.html" target="_self">internal</a></td><td class="desc"></td></tr>
+<tr id="row_0_4_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d4/db8/structffdb_1_1fdb__result.html" target="_self">fdb_result</a></td><td class="desc"></td></tr>
+<tr id="row_0_5_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d7/d37/classffdb_1_1fdb__transaction.html" target="_self">fdb_transaction</a></td><td class="desc">RAII object encapsulating a FDBTransaction If not committed, transaction is rolled back at destruction time </td></tr>
+<tr id="row_0_6_" class="even"><td class="entry"><span style="width:16px;display:inline-block;">&#160;</span><span id="arr_0_6_" class="arrow" onclick="toggleFolder('0_6_')">&#9660;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d7/df6/classffdb_1_1free__fdb.html" target="_self">free_fdb</a></td><td class="desc">RAII Object representing an instance of the foundationdb, At construction time a thread is launched in order to handle the fdb network. At the first initialization of the foundationdb (ensured by a std::once_flag semaphore) network is setup </td></tr>
+<tr id="row_0_6_0_"><td class="entry"><span style="width:48px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d3/d50/structffdb_1_1free__fdb_1_1internal.html" target="_self">internal</a></td><td class="desc"></td></tr>
+<tr id="row_0_7_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="da/d50/structffdb_1_1it__options.html" target="_self">it_options</a></td><td class="desc"></td></tr>
+<tr id="row_0_8_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d0/d91/structffdb_1_1range__options.html" target="_self">range_options</a></td><td class="desc">Possible Options for range selection on a transaction (used by <a class="el" href="d7/d37/classffdb_1_1fdb__transaction.html#a957417155dc46f4edd9a3452d6d4e1d9" title="Efficiently retrieve a full (depending on the potential limitation in the given option) range followi...">fdb_transaction::get_range</a> method) </td></tr>
+<tr id="row_0_9_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d5/dfb/structffdb_1_1range__result.html" target="_self">range_result</a></td><td class="desc"></td></tr>
+<tr id="row_0_10_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="d7/dd2/classffdb_1_1transaction__exception.html" target="_self">transaction_exception</a></td><td class="desc"></td></tr>
 </table>
 </div><!-- directory -->
 </div><!-- contents -->

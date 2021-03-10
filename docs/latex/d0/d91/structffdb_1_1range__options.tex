@@ -1,0 +1,62 @@
+\hypertarget{structffdb_1_1range__options}{}\doxysection{ffdb\+::range\+\_\+options Struct Reference}
+\label{structffdb_1_1range__options}\index{ffdb::range\_options@{ffdb::range\_options}}
+
+
+Possible Options for range selection on a transaction (used by \mbox{\hyperlink{classffdb_1_1fdb__transaction_a957417155dc46f4edd9a3452d6d4e1d9}{fdb\+\_\+transaction\+::get\+\_\+range}} method)  
+
+
+
+
+{\ttfamily \#include $<$ffdb.\+hh$>$}
+
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{structffdb_1_1range__options_a8925155c64dddffedcb9251dc30abd8e}{limit}} = 0
+\begin{DoxyCompactList}\small\item\em if set to 0, no maximum is set, otherwise iteration stop when equal to the maximum iteration \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{structffdb_1_1range__options_a3c32ed65c04503185e4f29396d2507bb}{max}} = 0
+\begin{DoxyCompactList}\small\item\em max byte size from a range \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structffdb_1_1range__options_a3554d7ac691f09055a50797d9f193560}\label{structffdb_1_1range__options_a3554d7ac691f09055a50797d9f193560}} 
+bool {\bfseries lower\+\_\+bound\+\_\+inclusive} = true
+\item 
+\mbox{\Hypertarget{structffdb_1_1range__options_a2e648ffa02d28f74ac336bcfe4da7e87}\label{structffdb_1_1range__options_a2e648ffa02d28f74ac336bcfe4da7e87}} 
+bool {\bfseries upper\+\_\+bound\+\_\+inclusive} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Possible Options for range selection on a transaction (used by \mbox{\hyperlink{classffdb_1_1fdb__transaction_a957417155dc46f4edd9a3452d6d4e1d9}{fdb\+\_\+transaction\+::get\+\_\+range}} method) 
+
+by default \+:
+\begin{DoxyItemize}
+\item no limit either in bytes or number of item are imposed,
+\item lower\+\_\+bound is inclusive
+\item upper\+\_\+bound is exclusive 
+\end{DoxyItemize}
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{structffdb_1_1range__options_a8925155c64dddffedcb9251dc30abd8e}\label{structffdb_1_1range__options_a8925155c64dddffedcb9251dc30abd8e}} 
+\index{ffdb::range\_options@{ffdb::range\_options}!limit@{limit}}
+\index{limit@{limit}!ffdb::range\_options@{ffdb::range\_options}}
+\doxysubsubsection{\texorpdfstring{limit}{limit}}
+{\footnotesize\ttfamily int ffdb\+::range\+\_\+options\+::limit = 0}
+
+
+
+if set to 0, no maximum is set, otherwise iteration stop when equal to the maximum iteration 
+
+\mbox{\Hypertarget{structffdb_1_1range__options_a3c32ed65c04503185e4f29396d2507bb}\label{structffdb_1_1range__options_a3c32ed65c04503185e4f29396d2507bb}} 
+\index{ffdb::range\_options@{ffdb::range\_options}!max@{max}}
+\index{max@{max}!ffdb::range\_options@{ffdb::range\_options}}
+\doxysubsubsection{\texorpdfstring{max}{max}}
+{\footnotesize\ttfamily int ffdb\+::range\+\_\+options\+::max = 0}
+
+
+
+max byte size from a range 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/free\+\_\+fdb/ffdb.\+hh\end{DoxyCompactItemize}
