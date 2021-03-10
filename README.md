@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/free-fdb/badge/?version=latest)](https://free-fdb.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://codedocs.xyz/FreeYourSoul/free_fdb.svg)](https://codedocs.xyz/FreeYourSoul/free_fdb/)
 
 # Free FoundationDB
 
@@ -20,14 +20,14 @@ A C++ binding library for [FoundationDB](https://www.foundationdb.org/).
 
 [Quick Start doc available here](#quick-start)
 
-A complete doxygen documentation is available [here](todo). 
+A complete doxygen documentation is available [here](https://freeyoursoul.github.io/free_fdb/html/index.html). 
 
 ## Installation
 
 
 ## Quick start
 
-Here is the quick start tutorial with some example of how to use the c++ binding above. The [doxygen documentation](todo) provide more precise information.
+Here is the quick start tutorial with some example of how to use the c++ binding above. The [doxygen documentation](https://freeyoursoul.github.io/free_fdb/html/index.html) provide more precise information.
 
 ### Using Nix
 
