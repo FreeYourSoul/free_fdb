@@ -205,7 +205,7 @@ public:
    *
    * @see https://apple.github.io/foundationdb/api-c.html#c.FDBStreamingMode
    */
-  fdb_iterator make_iterator(ffdb::it_options range);
+  fdb_iterator make_iterator(ffdb::it_options range = {});
 
 private:
   std::unique_ptr<internal> _impl;

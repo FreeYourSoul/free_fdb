@@ -23,40 +23,22 @@
 
 #include <catch2/catch.hpp>
 
-#include <mutex>
-#include <thread>
-
 #include <fmt/format.h>
 
-#include <free_fdb/ffdb.hh>
+#include "db_setup_test.hh"
 
-namespace {
-
-[[nodiscard]] static std::string local_path_cluster_file() {
-  std::string file_path = __FILE__;
-  std::string dir_path = file_path.substr(0, file_path.rfind('\\'));
-  if (dir_path.size() == file_path.size())
-	dir_path = file_path.substr(0, file_path.rfind('/'));
-  return dir_path + "/fdb.cluster";
-}
-
-}// namespace
-
-std::once_flag once;
+static std::once_flag once;
 
 TEST_CASE("ffdb_testcase_put_get_delete") {
 
-  // static, only one instance need to be done, re-starting network doesn't work well with foundationdb
-  // https://github.com/apple/foundationdb/issues/2981
-  static auto ffdb = ffdb::free_fdb(local_path_cluster_file());
   // full clear db for test
-  std::call_once(once, [trans = ffdb.make_transaction()]() {
+  std::call_once(once, [trans = testing::ffdb.make_transaction()]() {
 	trans->del_range("", "\xFF");
 	trans->commit();
   });
 
   SECTION("put_get test") {
-	auto trans = ffdb.make_transaction();
+	auto trans = testing::ffdb.make_transaction();
 	trans->put("key_1", "value_1");
 	trans->put("key_2", "value_2");
 	trans->put("key_3", "value_3");
@@ -91,14 +73,14 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 
   SECTION("None found (not committed before)") {
 	//	std::this_thread::sleep_for(std::chrono::seconds(1));
-	auto t = ffdb.make_transaction();
+	auto t = testing::ffdb.make_transaction();
 	auto k = t->get("key_1");
 
 	CHECK_FALSE(k.has_value());
   }// End section : None found (not committed before)
 
   SECTION("commit test") {
-	auto trans = ffdb.make_transaction();
+	auto trans = testing::ffdb.make_transaction();
 
 	trans->put("key_1", "value_1");
 	trans->put("key_2", "value_2");
@@ -106,7 +88,7 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 	trans->put("key_4", "value_4");
 
 	{
-	  auto trans2 = ffdb.make_transaction();
+	  auto trans2 = testing::ffdb.make_transaction();
 	  auto key_1 = trans2->get("key_1");
 	  auto key_2 = trans2->get("key_2");
 	  auto key_3 = trans2->get("key_3");
@@ -119,7 +101,7 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 	trans->commit();
 
 	{
-	  auto trans2 = ffdb.make_transaction();
+	  auto trans2 = testing::ffdb.make_transaction();
 	  auto key_1 = trans2->get("key_1");
 	  auto key_2 = trans2->get("key_2");
 	  auto key_3 = trans2->get("key_3");
@@ -132,7 +114,7 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 
 	SECTION("delete test") {
 
-	  auto trans_del = ffdb.make_transaction();
+	  auto trans_del = testing::ffdb.make_transaction();
 
 	  trans_del->del("key_1");
 	  trans_del->del("key_2");
@@ -158,13 +140,13 @@ TEST_CASE("ffdb_testcase_put_get_delete") {
 
   SECTION("list test") {
 
-	auto trans_clear = ffdb.make_transaction();
+	auto trans_clear = testing::ffdb.make_transaction();
 
 	// full clear db to ensure everything is clean
 	trans_clear->del_range("", "\xFF");
 	trans_clear->commit();
 
-	auto trans = ffdb.make_transaction();
+	auto trans = testing::ffdb.make_transaction();
 
 	// 4 key 'A' starting
 	trans->put("A_key_1", "A_value_1");

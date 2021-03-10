@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/free-fdb/badge/?version=latest)](https://free-fdb.readthedocs.io/en/latest/?badge=latest)
+
 # Free FoundationDB
 
 A C++ binding library for [FoundationDB](https://www.foundationdb.org/).
@@ -16,13 +18,16 @@ A C++ binding library for [FoundationDB](https://www.foundationdb.org/).
 * Delete a range of key/value
 * Iterator implementation for range access
 
-[Quick Start doc available here](doc/quick_start.md)
+[Quick Start doc available here](#quick-start)
 
-A complete documentation is available [here](doc/README.md). 
+A complete doxygen documentation is available [here](todo). 
 
 ## Installation
 
 
+## Quick start
+
+Here is the quick start tutorial with some example of how to use the c++ binding above. The [doxygen documentation](todo) provide more precise information.
 
 ### Using Nix
 

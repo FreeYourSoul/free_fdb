@@ -43,6 +43,13 @@ struct fdb_iterator::internal {
 
   internal(std::shared_ptr<fdb_transaction> t, it_options opt) : trans(std::move(t)), opt(std::move(opt)) {}
 
+  void reset_iterator() {
+	trans->reset();
+	validity = false;
+	current_result = {};
+	seeker = nullptr;
+  }
+
   std::shared_ptr<fdb_transaction> trans;
   it_options opt;
 
@@ -60,14 +67,15 @@ fdb_iterator::fdb_iterator(std::shared_ptr<fdb_transaction> t, it_options opt)
 	: _impl(std::make_unique<internal>(std::move(t), std::move(opt))) {
 }
 
-void fdb_iterator::seek(const std::string &key) {
+void fdb_iterator::seek(std::string key) {
   std::string end = key;
   ++end.back();
 
   if (_impl->seeker) {
-	_impl->trans->reset();
+	_impl->reset_iterator();
   }
-  _impl->seeker = [&]() {
+  _impl->validity = true;
+  _impl->seeker = [this, key = std::move(key), end = std::move(end)]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
 
@@ -81,29 +89,33 @@ void fdb_iterator::seek(const std::string &key) {
   next();
 }
 
-void fdb_iterator::seek_for_prev(const std::string &key) {
+void fdb_iterator::seek_for_prev(std::string key) {
+  std::string begin = key;
+  --begin.back();
   if (_impl->seeker) {
-	_impl->trans->reset();
+	_impl->reset_iterator();
   }
-  _impl->seeker = [&]() {
+  _impl->validity = true;
+  _impl->seeker = [this, key = std::move(key), begin = std::move(begin)]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
 
-		reinterpret_cast<const uint8_t *>(key.c_str()), key.size(), 0, -1,
+		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(begin.c_str()), begin.size()),
 		FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(key.c_str()), key.size()),
 
 		_impl->opt.limit, _impl->opt.max,
 		FDBStreamingMode::FDB_STREAMING_MODE_ITERATOR, _impl->index,
-		_impl->opt.snapshot, not_reversed());
+		_impl->opt.snapshot, reversed());
   };
   next();
 }
 
 void fdb_iterator::seek_first() {
   if (_impl->seeker) {
-	_impl->trans->reset();
+	_impl->reset_iterator();
   }
-  _impl->seeker = [&]() {
+  _impl->validity = true;
+  _impl->seeker = [this]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
 
@@ -121,8 +133,9 @@ void fdb_iterator::seek_first() {
 
 void fdb_iterator::seek_last() {
   if (_impl->seeker) {
-	_impl->trans->reset();
+	_impl->reset_iterator();
   }
+  _impl->validity = true;
   _impl->seeker = [&]() {
 	return fdb_transaction_get_range(
 		_impl->trans->raw(),
@@ -144,21 +157,20 @@ void fdb_iterator::next() {
 	fdb_future fut(_impl->seeker());
 	fut.get([this](FDBFuture *f) {
 	  const FDBKeyValue *kv;
-	  int index;
+	  int count;
 	  fdb_bool_t more;
-	  check_fdb_code(fdb_future_get_keyvalue_array(f, &kv, &index, &more));
+	  check_fdb_code(fdb_future_get_keyvalue_array(f, &kv, &count, &more));
 
-	  if (index == 0) {
+	  if (count == 0 || !_impl->validity) {
 		_impl->validity = false;
 		return std::nullopt;
 	  }
-	  index = index - 1;
-
+	  int index = _impl->index - 1;
 	  _impl->current_result = fdb_result{
 		  std::string(static_cast<const char *>(kv[index].key), kv[index].key_length),
 		  std::string(static_cast<const char *>(kv[index].value), kv[index].value_length)};
 	  ++_impl->index;
-	  _impl->validity = true;
+	  _impl->validity = _impl->index <= count;
 	  return std::nullopt;
 	});
   }
@@ -168,17 +180,11 @@ bool fdb_iterator::is_valid() const {
   return _impl->validity;
 }
 
-std::optional<std::string> fdb_iterator::value() const {
-  if (!is_valid()) {
-	return std::nullopt;
-  }
+const std::string &fdb_iterator::value() const {
   return _impl->current_result.value;
 }
 
-std::optional<std::string> fdb_iterator::key() const {
-  if (!is_valid()) {
-	return std::nullopt;
-  }
+const std::string &fdb_iterator::key() const {
   return _impl->current_result.key;
 }
 
@@ -187,11 +193,12 @@ fdb_iterator &fdb_iterator::operator++() {
   return *this;
 }
 
-std::optional<fdb_result> fdb_iterator::operator*() const {
-  if (!is_valid()) {
-	return std::nullopt;
-  }
+const fdb_result &fdb_iterator::operator*() const {
   return _impl->current_result;
+}
+
+const fdb_iterator::value_type *fdb_iterator::operator->() const {
+  return &_impl->current_result;
 }
 
 }// namespace ffdb

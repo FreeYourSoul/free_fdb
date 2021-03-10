@@ -37,8 +37,8 @@ class fdb_transaction;
  *
  */
 struct it_options {
-  std::string iterate_lower_bound;
-  std::string iterate_upper_bound;
+  std::string iterate_lower_bound{};
+  std::string iterate_upper_bound{};
 
   //! if set to 0, no maximum is set, otherwise iteration stop when equal to the maximum iteration
   int limit = 0;
@@ -73,65 +73,87 @@ class fdb_iterator {
 
 public:
   using iterator_category = std::forward_iterator_tag;
-  using value_type        = fdb_result;
+  using value_type = fdb_result;
 
   ~fdb_iterator();
   fdb_iterator(std::shared_ptr<fdb_transaction> transaction, it_options opt);
 
   /**
-   *
-   * @return
+   * Same as calling next
+   * @return a reference to the current iterator
    */
-  fdb_iterator& operator++();
+  fdb_iterator &operator++();
 
   /**
-   *
-   * @return
+   * @return the key/value pair the iterator currently hold
    */
-  [[nodiscard]] std::optional<value_type> operator*() const;
+  [[nodiscard]] const value_type &operator*() const;
+  /**
+   * @return the key/value pair the iterator currently hold
+   */
+  [[nodiscard]] const value_type *operator->() const;
 
   /**
-   *
-   * @return
+   * @return value of the key/value pair the iterator currently hold
    */
-  [[nodiscard]] std::optional<std::string> value() const;
+  [[nodiscard]] const std::string &value() const;
 
   /**
-   *
-   * @return
+   * @return key of the key/value pair the iterator currently hold
    */
-  [[nodiscard]] std::optional<std::string> key() const;
+  [[nodiscard]] const std::string &key() const;
 
   /**
+   * Check if the iterator an be consumed from (next() method call).
    *
-   * @return
+   * @return true if the iterator is not fully consumed yet
    */
   [[nodiscard]] bool is_valid() const;
 
   /**
+   * Seek for the key provided
+   * From there, goes forward (lexicographically speaking) after each next() call
    *
-   * @param key
+   * If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
+   *
+   * @param key to look for in foundationdb
    */
-  void seek(const std::string &key);
+  void seek(std::string key);
 
   /**
+   * Seek for the previous key before the one provided
+   * From there, goes backward (lexicographically speaking) after each next() call
    *
-   * @param key
+   * If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
+   *
+   * @param key to find the previous key from in foundationdb
    */
-  void seek_for_prev(const std::string &key);
+  void seek_for_prev(std::string key);
 
   /**
+   * Seek for the first element in the range from the options set at construction time of the iterator.
+   * From there, goes forward (lexicographically speaking) after each next() call
    *
+   * If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
    */
   void seek_first();
 
   /**
+   * Seek for the last element in the range from the options set at construction time of the iterator.
+   * From there, goes backward (lexicographically speaking) after each next() call
    *
+   * If none is found, the iterator is invalidated and an empty key/value pair is set for the current value held
    */
   void seek_last();
 
-  /*
+  /**
+   * Make the iterator go to the next element, if no such element exists or if the range is going beyond the options
+   * set at construction time of the iterator, validity of the iterator is impacted (is_valid() return false)
    *
+   * Going forward or backward (lexicographically speaking) depend on the seek that has been selected.
+   * Refer to the documentation of the seeking method you use in order to know if it goes forward or backward
+   *
+   * Applying next to an invalid iterator do nothing.
    */
   void next();
 
