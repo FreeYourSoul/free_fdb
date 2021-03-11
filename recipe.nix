@@ -12,13 +12,13 @@ stdenv.mkDerivation rec {
       rev = use_revision;
     };
 
-
   buildInputs = [ cmake catch2 fmt foundationdb ];
   cmakeFlags = [ "-DBUILD_TESTING=ON" ];
 
   doCheck = true;
+
   checkPhase = ''
-    ctest -VV
+    ctest -VV    
   '';
 
   meta = with lib; {

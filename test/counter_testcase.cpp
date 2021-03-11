@@ -23,23 +23,85 @@
 
 #include <catch2/catch.hpp>
 
-#include <free_fdb/ffdb.hh>
+#include "db_setup_test.hh"
+
+static std::once_flag once;
 
 TEST_CASE("counter_testcase") {
+  // full clear db for test
+  std::call_once(once, [trans = testing::ffdb.make_transaction()]() {
+	trans->del_range("", "\xFF");
+	trans->commit();
+  });
 
   SECTION("add test") {
 
+	std::string counter_name = "a_funny_counter";
+
+	auto trans = testing::ffdb.make_transaction();
+	ffdb::fdb_counter counter(counter_name);
+
+	CHECK_FALSE(trans->get(counter_name).has_value());
+	CHECK(counter.value(*trans) == 0);
+
+	counter.add(*trans);
+
+	CHECK(counter.value(*trans) == 1);
+
+	counter.add(*trans);
+	counter.add(*trans);
+
+	CHECK(counter.value(*trans) == 3);
+
+	counter.add(*trans, 255);
+
+	CHECK(counter.value(*trans) == 258);
+
+	SECTION("sub test") {
+
+	  counter.sub(*trans, 259);
+	  CHECK(counter.value(*trans) == -1);
+
+	  counter.sub(*trans);
+	  counter.sub(*trans);
+	  CHECK(counter.value(*trans) == -3);
+	  counter.sub(*trans);
+
+	}// End section : sub test
+
   }// End section : add test
 
-  SECTION("sub test") {
+  SECTION("parallel aggressive") {
+	std::string counter_name = "a_funny_counter";
+	ffdb::fdb_counter counter(counter_name);
 
-  }// End section : sub test
+	auto t1 = std::thread([&](){
+	  auto t = testing::ffdb.make_transaction();
+	  for(int i = 0; i < 1000; ++i) {
+		counter.add(*t);
+	  }
+	  t->commit();
+	});
+	auto t2 = std::thread([&](){
+	  for(int i = 0; i < 1337; ++i) {
+		auto t = testing::ffdb.make_transaction();
+		counter.add(*t);
+		t->commit();
+	  }
+	});
+	auto t3 = std::thread([&](){
+	  for(int i = 0; i < 500; ++i) {
+		auto t = testing::ffdb.make_transaction();
+		counter.sub(*t);
+		t->commit();
+	  }
+	});
+	t1.join();
+	t2.join();
+	t3.join();
 
-  SECTION("combined") {
-
-  }// End section : combined
-
-  SECTION("parallel") {
+	auto trans = testing::ffdb.make_transaction();
+	CHECK(counter.value(*trans) == 1837);
 
   }// End section : parallel
 

@@ -57,7 +57,6 @@ struct free_fdb::internal {
 		  throw fdb_exception(fmt::format("Error while starting network: {}", fdb_get_error(error)));
 		}
 	  });
-
 	});
 
 	if (auto error = fdb_create_database(cluster_file_path.c_str(), &db); error) {
@@ -154,40 +153,40 @@ std::optional<fdb_result> fdb_transaction::get(const std::string &key) {
 range_result fdb_transaction::get_range(const std::string &from, const std::string &to, range_options opt) {
   if (_trans) {
 
-	auto appropriate_range_call = [this, &from, &to](const range_options& opt){
-		if (opt.lower_bound_inclusive) {
-		  if (opt.upper_bound_inclusive) {
-			// [ begin, end ]
-			return fdb_transaction_get_range(
-				_trans,
-				FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
-				FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
-				opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
-		  } else {
-			// [ begin, end [
-			return fdb_transaction_get_range(
-				_trans,
-				FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
-				FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
-				opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
-		  }
+	auto appropriate_range_call = [this, &from, &to](const range_options &opt) {
+	  if (opt.lower_bound_inclusive) {
+		if (opt.upper_bound_inclusive) {
+		  // [ begin, end ]
+		  return fdb_transaction_get_range(
+			  _trans,
+			  FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
+			  FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
+			  opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
 		} else {
-		  if (opt.upper_bound_inclusive) {
-			// ] begin, end ]
-			return fdb_transaction_get_range(
-				_trans,
-				FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
-				FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
-				opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
-		  } else {
-			// ] begin, end [
-			return fdb_transaction_get_range(
-				_trans,
-				FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
-				FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
-				opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
-		  }
+		  // [ begin, end [
+		  return fdb_transaction_get_range(
+			  _trans,
+			  FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
+			  FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
+			  opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
 		}
+	  } else {
+		if (opt.upper_bound_inclusive) {
+		  // ] begin, end ]
+		  return fdb_transaction_get_range(
+			  _trans,
+			  FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
+			  FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
+			  opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
+		} else {
+		  // ] begin, end [
+		  return fdb_transaction_get_range(
+			  _trans,
+			  FDB_KEYSEL_FIRST_GREATER_THAN(reinterpret_cast<const uint8_t *>(from.c_str()), from.size()),
+			  FDB_KEYSEL_FIRST_GREATER_OR_EQUAL(reinterpret_cast<const uint8_t *>(to.c_str()), to.size()),
+			  opt.limit, opt.max, FDBStreamingMode::FDB_STREAMING_MODE_WANT_ALL, 0, _snapshot_enabled, not_reversed());
+		}
+	  }
 	};
 
 	auto fut = fdb_future(appropriate_range_call(opt));
@@ -203,8 +202,8 @@ range_result fdb_transaction::get_range(const std::string &from, const std::stri
 	  result.values.reserve(out_count);
 	  for (int i = 0; i < out_count; ++i) {
 		result.values.emplace_back(fdb_result{
-			std::string(reinterpret_cast<const char *>(key_value[i].key), key_value[i].key_length),
-			std::string(reinterpret_cast<const char *>(key_value[i].value), key_value[i].value_length)});
+			std::string(static_cast<const char *>(key_value[i].key), key_value[i].key_length),
+			std::string(static_cast<const char *>(key_value[i].value), key_value[i].value_length)});
 	  }
 	  return result;
 	});
@@ -233,14 +232,29 @@ void fdb_transaction::commit() {
 fdb_counter::fdb_counter(std::string key) : _key(std::move(key)) {
 }
 
-std::uint64_t fdb_counter::value(fdb_transaction &transaction) {
-  return 0;
+std::int64_t fdb_counter::value(fdb_transaction &transaction) {
+  auto counter = transaction.get(_key);
+  if (!counter) {
+	return 0;
+  }
+  return *((const std::int64_t*)(counter->value.c_str()));
 }
 
-void fdb_counter::add(fdb_transaction &transaction, std::uint32_t increment) {
+void fdb_counter::add(fdb_transaction &transaction, std::int64_t increment) {
+  fdb_transaction_atomic_op(
+	  transaction.raw(),
+	  (const uint8_t *)(_key.c_str()),
+	  _key.size(), (const uint8_t *)(&increment), sizeof(std::int64_t),
+	  FDBMutationType::FDB_MUTATION_TYPE_ADD);
 }
 
-void fdb_counter::sub(fdb_transaction &transaction, std::uint32_t decrement) {
+void fdb_counter::sub(fdb_transaction &transaction, std::int64_t decrement) {
+  decrement *= -1;
+  fdb_transaction_atomic_op(
+	  transaction.raw(),
+	  (const uint8_t *)(_key.c_str()),
+	  _key.size(), (const uint8_t *)(&decrement), sizeof(std::int64_t),
+	  FDBMutationType::FDB_MUTATION_TYPE_ADD);
 }
 
 }// namespace ffdb

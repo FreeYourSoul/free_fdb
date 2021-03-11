@@ -212,7 +212,8 @@ private:
 };
 
 /**
- *
+ * Represent a counter in foundationdb,
+ * The counter is represented as a std::int64_t in the database. It can be incre/decremented and retrieved.
  */
 class fdb_counter {
 
@@ -220,28 +221,35 @@ public:
   explicit fdb_counter(std::string key);
 
   /**
-   *
-   * @param transaction
-   * @return
+   * Retrieve the current value of the counter
+   * @param transaction from which the counter has to be retrieved
+   * @return value of the counter
    */
-  [[nodiscard]] std::uint64_t value(fdb_transaction &transaction);
+  [[nodiscard]] std::int64_t value(fdb_transaction &transaction);
 
   /**
+   * Increment a given amount to the counter.
+   * The value is not clamped (no overflow management)
+   * Modification is taken into account after the provided transaction does a commit.
    *
-   * @param transaction
-   * @param increment
+   * @param transaction on which the action is applied
+   * @param increment amount to increment on the counter.
    */
-  void add(fdb_transaction &transaction, std::uint32_t increment);
+  void add(fdb_transaction &transaction, std::int64_t increment = 1);
 
   /**
+   * Decrement a given amount from the counter.
+   * The value is not clamped (no underflow management)
+   * Modification is taken into account after the provided transaction does a commit.
    *
-   * @param transaction
-   * @param decrement
+   * @param transaction on which the action is applied
+   * @param decrement amount to decrement from the counter
    */
-  void sub(fdb_transaction &transaction, std::uint32_t decrement);
+  void sub(fdb_transaction &transaction, std::int64_t decrement = 1);
 
 private:
   std::string _key;
+
 };
 
 }// namespace ffdb
