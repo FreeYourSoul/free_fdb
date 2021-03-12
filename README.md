@@ -1,3 +1,4 @@
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/FreeYourSoul/free_fdb/master/LICENSE)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/33a26831117e4d6bb71e0cda88c5692b)](https://www.codacy.com/gh/FreeYourSoul/free_fdb/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=FreeYourSoul/free_fdb&amp;utm_campaign=Badge_Grade)
 [![Documentation Status](https://codedocs.xyz/FreeYourSoul/free_fdb.svg)](https://codedocs.xyz/FreeYourSoul/free_fdb/)
 
@@ -116,6 +117,22 @@ auto iterator = ffdb.make_iterator();
 
 * Counter implementation (using foundationdb atomic operations)
   ```c++
+  auto trans = ffdb_instance.make_transaction();
+  auto counter = ffdb::fdb_counter("counter_key");
+  
+  assert(counter.value() == 0);
+  
+  counter.add(trans);
+  assert(counter.value() == 1);
+  
+  counter.add(trans, 4);
+  assert(counter.value() == 5);
+  
+  counter.sub(trans, 1);
+  assert(counter.value() == 4);
+  
+  counter.add(trans, -1);
+  assert(counter.value() == 3);
   
   ```
 
@@ -130,6 +147,8 @@ A nix utility is also present in order to install/build locally free_fdb for loc
 ```shell
 nix-build . -A ffdb
 ```
+
+_TODO: hard to have the ci  working... it is required to have an instance of foundationdb running. But starting the service isn't trivial through the nix recipe.._
 
 If you want to integrate free_fdb from your local nix project, you can add an attribute by fetching the recipe.nix file to your nix file directly with the url. Or you can just copy the recipe.nix file into your repository.
 
