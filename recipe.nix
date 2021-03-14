@@ -18,6 +18,8 @@ stdenv.mkDerivation rec {
   doCheck = true;
 
   checkPhase = ''
+    fdbserver -p 127.0.0.1:4500 -C ${src}/test/fdb.cluster -d /tmp
+
     ctest -VV    
   '';
 
