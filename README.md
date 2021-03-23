@@ -160,7 +160,7 @@ in with pkgs; rec {
 
   # External Dependencies (personal)
   ffdb = (callPackage (builtins.fetchurl
-    "https://raw.githubusercontent.com/FreeYourSoul/free_fdb/{commit-hash}/recipee.nix") {
+    "https://raw.githubusercontent.com/FreeYourSoul/free_fdb/{commit-hash}/recipe.nix") {
       rev = "{commit-hash}";
     });
     

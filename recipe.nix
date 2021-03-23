@@ -1,4 +1,5 @@
-{ stdenv, callPackage, lib, cmake, catch2, fmt, nix-gitignore, foundationdb, use_revision ? null }:
+{ stdenv, callPackage, lib, cmake, catch2, fmt, nix-gitignore, foundationdb
+, use_revision ? null }:
 
 stdenv.mkDerivation rec {
   version = "1.0.0";
@@ -15,7 +16,7 @@ stdenv.mkDerivation rec {
   buildInputs = [ cmake catch2 fmt foundationdb ];
   cmakeFlags = [ "-DBUILD_TESTING=ON" ];
 
-  doCheck = true;
+  doCheck = false;
 
   checkPhase = ''
     fdbserver -p 127.0.0.1:4500 -C ${src}/test/fdb.cluster -d /tmp
