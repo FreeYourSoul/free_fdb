@@ -27,7 +27,7 @@
 #include <mutex>
 #include <thread>
 
-#include <free_fdb/ffdb.hh>
+#include "../include/free_fdb/ffdb.hh"
 
 namespace testing {
 

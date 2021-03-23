@@ -27,13 +27,13 @@
 #include <fmt/format.h>
 
 #include <exception>
-#include <memory>
+#include <optional>
+#include <utility>
 
 #define FDB_API_VERSION 610
 #include <foundationdb/fdb_c.h>
 
-#include <free_fdb/iterator.hh>
-#include <utility>
+#include "iterator.hh"
 
 namespace ffdb {
 
@@ -74,7 +74,6 @@ struct range_options {
 
   bool lower_bound_inclusive = true;
   bool upper_bound_inclusive = false;
-
 };
 
 /**
@@ -249,7 +248,6 @@ public:
 
 private:
   std::string _key;
-
 };
 
 }// namespace ffdb

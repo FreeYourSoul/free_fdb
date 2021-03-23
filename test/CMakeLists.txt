@@ -1,5 +1,4 @@
 find_package(Catch2 QUIET)
-include(Catch)
 
 add_executable(ffdb_test
         ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
