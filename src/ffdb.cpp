@@ -232,7 +232,7 @@ void fdb_transaction::commit() {
 fdb_counter::fdb_counter(std::string key) : _key(std::move(key)) {
 }
 
-std::int64_t fdb_counter::value(fdb_transaction &transaction) {
+std::int64_t fdb_counter::value(fdb_transaction &transaction) const {
   auto counter = transaction.get(_key);
   if (!counter) {
 	return 0;

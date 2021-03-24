@@ -224,7 +224,7 @@ public:
    * @param transaction from which the counter has to be retrieved
    * @return value of the counter
    */
-  [[nodiscard]] std::int64_t value(fdb_transaction &transaction);
+  [[nodiscard]] std::int64_t value(fdb_transaction &transaction) const;
 
   /**
    * Increment a given amount to the counter.
