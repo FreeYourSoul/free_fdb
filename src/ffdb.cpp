@@ -240,7 +240,7 @@ std::int64_t fdb_counter::value(fdb_transaction &transaction) const {
   return *((const std::int64_t*)(counter->value.c_str()));
 }
 
-void fdb_counter::add(fdb_transaction &transaction, std::int64_t increment) {
+void fdb_counter::add(fdb_transaction &transaction, std::int64_t increment) const {
   fdb_transaction_atomic_op(
 	  transaction.raw(),
 	  (const uint8_t *)(_key.c_str()),
@@ -248,7 +248,7 @@ void fdb_counter::add(fdb_transaction &transaction, std::int64_t increment) {
 	  FDBMutationType::FDB_MUTATION_TYPE_ADD);
 }
 
-void fdb_counter::sub(fdb_transaction &transaction, std::int64_t decrement) {
+void fdb_counter::sub(fdb_transaction &transaction, std::int64_t decrement) const {
   decrement *= -1;
   fdb_transaction_atomic_op(
 	  transaction.raw(),

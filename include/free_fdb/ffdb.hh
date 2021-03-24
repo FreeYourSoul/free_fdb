@@ -234,7 +234,7 @@ public:
    * @param transaction on which the action is applied
    * @param increment amount to increment on the counter.
    */
-  void add(fdb_transaction &transaction, std::int64_t increment = 1);
+  void add(fdb_transaction &transaction, std::int64_t increment = 1) const;
 
   /**
    * Decrement a given amount from the counter.
@@ -244,7 +244,12 @@ public:
    * @param transaction on which the action is applied
    * @param decrement amount to decrement from the counter
    */
-  void sub(fdb_transaction &transaction, std::int64_t decrement = 1);
+  void sub(fdb_transaction &transaction, std::int64_t decrement = 1) const;
+
+  /**
+   * @return retrieve the db key of the counter
+   */
+  const std::string& key() const { return _key; }
 
 private:
   std::string _key;
